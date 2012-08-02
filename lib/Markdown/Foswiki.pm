@@ -1,7 +1,7 @@
 package Markdown::Foswiki;
 use strict;
 use warnings;
-our $VERSION = '0.01';
+our $VERSION = '0.03';
 
 use 5.010;
 
@@ -206,14 +206,11 @@ sub process {
 
 		for ( @listers ) {
 		    my $listDepth = 0;
-		    # 
-                    # 숫자로 시작되고 그 뒤가 공백이거나 .숫자.숫자...공백 이런형식을 가진 시작문자열을 추려냄 ( 넘버링된 리스트로 간주함 )
+              
 		    if ( /^((?:$numbers+(?:\.)(?:$numbers+(?:\.| ))*)|(?:$numbers+\s))/ ) {
 			$listDepth++ for split /$numbers+/,$1;
 		    }
 
-		    #listDepth 에서 1을 빼는 이유는 문자열의 중심이 되는 수(n의자리)를 분리자로 두기 때문에
-		    #경우에 따라 공백 또는 마침표(.)가 수를 감싸고 있기 때문에 깊이를 분리후의 원소가 하나더 늘어난다.
 		    $listDepth -= $listDepth > 0? 1:0;
 
 		    if ( /^$numbers/ ) {
@@ -323,16 +320,16 @@ version 0.01
     
     use Markdown::Foswiki;
     my $mc = Markdown::Foswiki->new();
-    my $md_text = $mc->getData('index.md');
-    my $fw_text = $mc->process($md_text);
+    my @md_lines = $mc->getData('index.md');
+    my $fw_text = $mc->process(@md_lines);;
     print $fw_text;
 
-oneline
+
     use Markdown::Foswiki;
     my $mc = Markdown::Foswiki->new();
     print $mc->process($mc->getData('index.md'));
 
-save 
+
     $mc->save ( $fw_text, '', 'index.txt');
 
 =head1 DESCRIPTION
@@ -346,12 +343,18 @@ If the external link is retained.
 
 =head2 CODE detecting 
 
-This Feature wrapping to %CODE% Mark or verbatim tag if detect code context 
+This Feature wrapping to %CODE% Mark or verbatim tag if detect code context
+ 
 you can switching Whether to use from config-IncLang Attribute 
+
+
+
 set 'none' if want to maintaining code context 
+
 set 'plain' if want to wrapping to verbatim tag 
 
 be Styling with in SyntaxHighlighter if setting other options,
+
 must installed SyntaxHighLighter plugin at your foswiki or twiki
 
     
@@ -377,42 +380,48 @@ Returns loaded markdown text lines from $file
 
 =item * header_text
 
-default
+default :
+
     %META:TOPICINFO{author="Markdown::Foswiki" date="unixTimeStamp" format="1.1" version="1"}%
 
 or your header
 
 =item * head_contents
 
-default
+default :
+
     "%TOC%\n";
 
 or your head contents
 
 =item * footer_text
 
-default
+default :
+
     blink
 
 or your footer
 
 =item * foot_contents
 
-default
+default :
+
     blink
 
 or your foot contents
 
 =item * InterLinkBase
 
-default
+default :
+
     blink
 
 =item * IncLang
 
 for code detectings
 
-default
+default :
+
     plain
 
 options 
