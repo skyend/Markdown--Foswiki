@@ -1,7 +1,7 @@
 package Markdown::Foswiki;
 use strict;
 use warnings;
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 use 5.010;
 
@@ -89,7 +89,7 @@ sub initialize {
     # Table close -> new line
     $rules{Row} 		   = qr /^----$/;
     # Row ---- -> ---
-    $rules{Heading} 		   = qr /^(#+?)\s(.*)/;
+    $rules{Heading} 		   = qr /^(#+?)\s(.*?)#*$/;
     # Heading #.. Word -> ---+.. Word
     $rules{Bold} 		   = qr /^\*(\*.*?\*)\*$/; 
     # Bold **Word** -> *Word*
@@ -109,7 +109,9 @@ sub initialize {
     # List ^   * Word level1 | ^      * Word level2...
     $rules{FunctionDetecting} 	   = qr /^[a-zA-Z\_][\w\_]*?\s?\(.*?\).*(\.)/; 
     # function
-    
+    $rules{indent}                 = qr /^\t+(.*?)$/;
+    # begin \t word
+
     $self->{rules} = {%rules};
 }
 
@@ -232,7 +234,9 @@ sub process {
 	    when ( /$self->{rules}->{FunctionDetecting}/ ) {  
 		$converted = "\n<verbatim>\n$_\n</verbatim>\n";
 	    }
-
+	    when ( /$self->{rules}->{indent}/ ){
+		$converted = "\n<verbatim>\n$1\n</verbatim>\n";
+	    }
 	    default {
 		$converted = $_."\n\n";
 	    }
@@ -314,7 +318,7 @@ Markdown::Foswiki - Convert Markdown to Foswiki(Twiki) α
 
 =head1 VERSION
 
-version 0.01
+version 0.04
 
 =head1 SYNOPSIS
     
